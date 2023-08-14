@@ -3,30 +3,45 @@ name: Update Instruction File
 
 on:
   push:
-    
+    branches:
+      - main
 
 jobs:
-  update_file:
+  update-instruction:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set Git user
+      - name: Create branch
         run: |
-          git config user.email "zeeshan.ijaz@emumba.com"
-          git config user.name "ZeeshanIB"
-
-      - name: Update file in branches
-        run: |
-          FILE_NAME="instruction.txt"
           BRANCHES=$(git branch -a --format="%(refname:short)")
           for BRANCH in $BRANCHES; do
             git checkout $BRANCH
-            echo "Updating $FILE_NAME in branch $BRANCH"
-            echo "Updated content in main patch 2 " > $FILE_NAME
-            git add $FILE_NAME
-            git commit -m "Update $FILE_NAME in $BRANCH"
-            git push origin $BRANCH
+            git switch -c update-instruction-$BRANCH
+            echo "Creating branch update-instruction-$BRANCH"
+            git push origin update-instruction-$BRANCH
+          done
+
+      - name: Update instruction file
+        run: |
+          BRANCHES=$(git branch -a --format="%(refname:short)")
+          for BRANCH in $BRANCHES; do
+            git checkout update-instruction-$BRANCH
+            echo "Updating instruction file in branch $BRANCH"
+            echo "Updated content" > instruction.txt
+            git add instruction.txt
+            git commit -m "Update instruction file"
+            git push origin update-instruction-$BRANCH
+          done
+
+      - name: Create pull requests
+        run: |
+          BRANCHES=$(git branch -a --format="%(refname:short)")
+          for BRANCH in $BRANCHES; do
+            BASE_BRANCH=${BRANCH#remotes/origin/}
+            PULL_BRANCH="update-instruction-$BRANCH"
+            echo "Creating pull request from $PULL_BRANCH to $BASE_BRANCH"
+            gh pr create --base $BASE_BRANCH --head $PULL_BRANCH --title "Update instruction file" --body "Automated update of instruction file"
           done
