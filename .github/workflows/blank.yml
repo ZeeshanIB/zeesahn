@@ -14,8 +14,8 @@ jobs:
 
       - name: Update instruction file
         run: |
-          # Update the instruction file content here
-          echo "This is an updated instruction." > instructions.txt
+          
+          echo "This is an updated instruction." > instruction.txt
 
       - name: Commit and push changes
         run: |
