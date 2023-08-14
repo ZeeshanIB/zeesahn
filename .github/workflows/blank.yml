@@ -16,7 +16,7 @@ jobs:
 
       - name: Update Instruction
         run: |
-          # Replace 'instruction.txt' with the name of your file
+        
           FILE_NAME="instruction.txt"
           BRANCHES=$(git branch -a | grep remotes | grep -v HEAD | grep -v main) 
           
