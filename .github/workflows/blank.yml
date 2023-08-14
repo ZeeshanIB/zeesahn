@@ -3,7 +3,7 @@ name: Update Instructions
 on:
   push:
     paths:
-      - 'instructions.txt'
+      - 'instruction.txt'
 
 jobs:
   update-instructions:
@@ -17,7 +17,7 @@ jobs:
         run: |
           # Replace this with your script to update the instruction file
           # For example, echo a new instruction into the file
-          echo "New instruction" > instructions.txt
+          echo "New instruction" > instruction.txt
 
       - name: Commit changes
         run: |
