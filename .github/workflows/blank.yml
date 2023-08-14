@@ -19,7 +19,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           # Iterate over all branches and update the instruction file
-          branches=("branch1" "branch2" "branch3")  # List all your branches here
+          branches=("patch-2")  # List all your branches here
           for branch in "${branches[@]}"; do
             git checkout $branch
             echo "$updated_content" > instruction.txt
