@@ -1,4 +1,5 @@
-name: UpdatInstruction
+
+name: Update Instruction
 
 on:
   push:
@@ -10,26 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v2
-        
+
       - name: Update Instruction
         run: |
-          # Replace `instruction.txt` with the path to your instruction file
-          FILE_PATH="instruction.txt"
-          NEW_CONTENT="Your updated instruction content here"
+          # Replace 'instruction.txt' with the name of your file
+          FILE_NAME="instruction.txt"
+          BRANCHES=$(git branch -a | grep remotes | grep -v HEAD | grep -v main) 
           
-          # Updating and committing the file
-          echo "$NEW_CONTENT" > $FILE_PATH
-          git add $FILE_PATH
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git commit -m "Update instruction.txt" --author "GitHub Actions <actions@github.com>"
-
-          # Pushing the changes back to all branches
-          BRANCHES=$(git branch --format "%(refname)")
-          for branch in $BRANCHES
-          do
-            branch="${branch#refs/heads/}"
-            git push origin HEAD:refs/heads/$branch
+          for BRANCH in $BRANCHES; do
+            git switch ${BRANCH#remotes/origin/}
+            echo "Updating $FILE_NAME in branch ${BRANCH#remotes/origin/}"
+            echo "Updated content" > $FILE_NAME
+            git add $FILE_NAME
+            git commit -m "Update $FILE_NAME in ${BRANCH#remotes/origin/}"
+            git push origin ${BRANCH#remotes/origin/}
           done
