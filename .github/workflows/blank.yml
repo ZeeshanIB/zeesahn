@@ -3,8 +3,7 @@ name: Update Instruction File
 
 on:
   push:
-    branches-ignore:
-      - main
+    
 
 jobs:
   update_file:
