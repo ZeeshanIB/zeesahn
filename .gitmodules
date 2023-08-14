@@ -1,0 +1,3 @@
+[submodule "shared-repo-test"]
+	path = shared-repo-test
+	url = https://github.com/ZeeshanIB/shared-repo-test.git
