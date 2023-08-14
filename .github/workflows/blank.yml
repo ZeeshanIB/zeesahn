@@ -3,8 +3,6 @@ name: Update Instruction File
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   update-instruction:
