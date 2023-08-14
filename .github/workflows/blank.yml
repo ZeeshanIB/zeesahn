@@ -11,6 +11,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Set Git user
+        run: |
+          git config user.email "zeeshan.ijaz@emumba.com"
+          git config user.name "ZeeshanIB"
 
       - name: Create branch
         run: |
