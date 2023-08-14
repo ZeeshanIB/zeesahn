@@ -23,6 +23,9 @@ jobs:
         run: |
           git config --local user.email "zeeshan.ijaz@emumba.com"
           git config --local user.name "ZeeshanIB"
+          git pull origin main
+          git push origin main
+
           git commit -am "Update instructions [skip ci]"
 
       - name: Push changes
