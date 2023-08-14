@@ -19,16 +19,13 @@ jobs:
           git config user.email "your-email@example.com"
           git config user.name "Your Name"
 
-      - name: Update instruction.txt in all branches
+      - name: Update file in all branches
         run: |
-          FILE_NAME="instruction.txt"
-          BRANCHES=$(git branch -a --format="%(refname:short)")
-
-          for BRANCH in $BRANCHES; do
-            git checkout $BRANCH
-            echo "Updating $FILE_NAME in branch $BRANCH"
-            echo "Updated content" > $FILE_NAME
-            git add $FILE_NAME
-            git commit -m "Update $FILE_NAME in $BRANCH"
-            git push origin $BRANCH
+          for branch in $(git branch -r --format="%(refname:short)"); do
+            git checkout "$branch"
+            echo "Updating instruction.txt in branch $branch"
+            echo "Updated content" > instruction.txt
+            git add instruction.txt
+            git commit -m "Update instruction.txt in $branch"
+            git push origin "$branch"
           done
