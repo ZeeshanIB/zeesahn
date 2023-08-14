@@ -2,30 +2,24 @@ name: Update Instructions
 
 on:
   push:
-    paths:
-      - 'instruction.txt'
+    branches:
+      - main
 
 jobs:
   update-instructions:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Update instructions
+      - name: Update instruction file
         run: |
-          # Replace this with your script to update the instruction file
-          # For example, echo a new instruction into the file
-          echo "New instruction" > instruction.txt
+          # Update the instruction file content here
+          echo "This is an updated instruction." > instructions.txt
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
-          git config --local user.email "zeeshan.ijaz@emumba.com"
-          git config --local user.name "ZeeshanIB"
-          git commit -am "Update instructions [skip ci]"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-       # with:
-        #  github_token: ${{ secrets.GITHUB_TOKEN }}
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Update instruction file"
+          git push
