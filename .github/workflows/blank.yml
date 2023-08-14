@@ -1,30 +1,26 @@
-
-name: Update Instruction
+name: Update Instruction File
 
 on:
   push:
     branches:
-      - '*'
+      - main
 
 jobs:
   update-instruction:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Update Instruction
+      - name: Update Instruction File
         run: |
-        
           FILE_NAME="instruction.txt"
-          BRANCHES=$(git branch -a | grep remotes | grep -v HEAD | grep -v main) 
-          
+          BRANCHES=$(git branch -a --format="%(refname:short)")
           for BRANCH in $BRANCHES; do
-            git switch ${BRANCH#remotes/origin/}
-            echo "Updating $FILE_NAME in branch ${BRANCH#remotes/origin/}"
+            git checkout $BRANCH
+            echo "Updating $FILE_NAME in branch $BRANCH"
             echo "Updated content" > $FILE_NAME
             git add $FILE_NAME
-            git commit -m "Update $FILE_NAME in ${BRANCH#remotes/origin/}"
-            git push origin ${BRANCH#remotes/origin/}
+            git commit -m "Update $FILE_NAME in $BRANCH"
+            git push origin $BRANCH
           done
