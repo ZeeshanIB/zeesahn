@@ -1,18 +1,25 @@
+
 name: Update Instruction File
 
 on:
   push:
-    branches:
+    branches-ignore:
       - main
 
 jobs:
-  update-instruction:
+  update_file:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Update Instruction File
+      - name: Set Git user
+        run: |
+          git config user.email "zeeshan.ijaz@emumba.com"
+          git config user.name "ZeeshanIB"
+
+      - name: Update file in branches
         run: |
           FILE_NAME="instruction.txt"
           BRANCHES=$(git branch -a --format="%(refname:short)")
