@@ -25,7 +25,7 @@ jobs:
           for BRANCH in $BRANCHES; do
             git checkout $BRANCH
             echo "Updating $FILE_NAME in branch $BRANCH"
-            echo "Updated content in main " > $FILE_NAME
+            echo "Updated content in main patch 2 " > $FILE_NAME
             git add $FILE_NAME
             git commit -m "Update $FILE_NAME in $BRANCH"
             git push origin $BRANCH
