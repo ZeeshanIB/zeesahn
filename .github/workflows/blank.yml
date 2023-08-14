@@ -15,14 +15,14 @@ jobs:
       - name: Update instruction file in other branches
         run: |
           # Get the updated instruction content from the main branch
-          updated_content=$(cat instructions.txt)
+          updated_content=$(cat instruction.txt)
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           # Iterate over all branches and update the instruction file
           branches=("branch1" "branch2" "branch3")  # List all your branches here
           for branch in "${branches[@]}"; do
             git checkout $branch
-            echo "$updated_content" > instructions.txt
+            echo "$updated_content" > instruction.txt
             git commit -am "Update instruction file from main branch"
             git push origin $branch
           done
