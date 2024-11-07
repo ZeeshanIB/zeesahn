@@ -1,29 +1,44 @@
-
 name: PR Description Validator
 
 on:
   pull_request:
     types: [opened, edited, reopened]
+    branches:
+      - patch-1
+
 
 jobs:
   validate-pr-description:
     name: Validate PR Description
     runs-on: ubuntu-latest
     steps:
-    - name: Set up workspace
-      uses: actions/checkout@v2
+      - name: Set up workspace
+        uses: actions/checkout@v2
 
-    - name: Validate PR Description
-      run: |
-        # Ensure jq is installed
-        sudo apt-get install jq
+      - name: Install jq
+        run: sudo apt-get install -y jq
 
-        # Fetch PR description using jq
-        PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
-        KEYWORD="DOP"
+      - name: Validate PR Description
+        run: |
+          # Fetch PR description using jq
+          PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
 
-        # Check for the required keyword in the PR description
-        if [[ $PR_DESCRIPTION != *"$KEYWORD"* ]]; then
-          echo "PR description does not contain the required keyword."
-          exit 1
-        fi
+          # Define keywords (add keywords here as needed)
+          KEYWORDS=("DOP" "PROJ" "TASK")
+
+          # Initialize a flag to check if any keyword is found
+          keyword_found=false
+
+          # Check if any keyword is present in the PR description, case-insensitively
+          for keyword in "${KEYWORDS[@]}"; do
+            if echo "$PR_DESCRIPTION" | grep -iq "$keyword"; then
+              keyword_found=true
+              break
+            fi
+          done
+
+          # Fail the job if none of the keywords are found
+          if [ "$keyword_found" = false ]; then
+            echo "PR description does not contain any of the required keywords (e.g., DOP, PROJ, TASK)."
+            exit 1
+          fi
