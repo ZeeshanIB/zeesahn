@@ -3,6 +3,9 @@ name: PR Description Validator
 on:
   pull_request:
     types: [opened, edited, reopened]
+    branches:
+      - patch-1
+
 
 jobs:
   validate-pr-description:
