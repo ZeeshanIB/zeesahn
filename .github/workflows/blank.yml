@@ -1,34 +1,34 @@
-name: Update Instructions
+name: Title Pattern Check
 
 on:
-  push:
+  pull_request:
+    types: [opened, edited]
     branches:
-      - main
+      - main   # Specify the branches where this check should run
+      - develop
+      - feature/* # Add more branches as needed
 
 jobs:
-  update-instructions:
+  check-title-pattern:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Check for required pattern in title
+        id: check_title_pattern
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { context, core } = require("@actions/github");
 
-      - name: Update instruction file in other branches
-        run: |
-          # Get the updated instruction content from the main branch
-          updated_content=$(cat instruction.txt)
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          # Iterate over all branches and update the instruction file
-          branches=("patch-2")  # List all your branches here
-          for branch in "${branches[@]}"; do
-            git checkout $branch
-            echo "$updated_content" > instruction.txt
-            git commit -am "Update instruction file from main branch"
-            git push origin $branch
-          done
+            // Define the required pattern for the PR title
+            const pattern = /YOUR_PATTERN_HERE/; // Replace with your regex pattern
 
-      - name: Switch back to main branch and push
-        run: |
-          git checkout main
-          git push origin main
+            // Get the pull request title
+            const title = context.payload.pull_request.title || "";
 
+            // Check if the title matches the pattern
+            if (!pattern.test(title)) {
+              core.setFailed(
+                "The PR title does not match the required pattern. Please update the title to follow the format."
+              );
+            }
