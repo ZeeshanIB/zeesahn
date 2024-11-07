@@ -21,7 +21,7 @@ jobs:
             const { context, core } = require("@actions/github");
 
             // Define the required pattern for the PR title
-            const pattern = /YOUR_PATTERN_HERE/; // Replace with your regex pattern
+            const pattern = "DOP-";
 
             // Get the pull request title
             const title = context.payload.pull_request.title || "";
