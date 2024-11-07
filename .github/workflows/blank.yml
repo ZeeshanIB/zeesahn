@@ -1,0 +1,34 @@
+name: Update Instructions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-instructions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update instruction file in other branches
+        run: |
+          # Get the updated instruction content from the main branch
+          updated_content=$(cat instruction.txt)
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # Iterate over all branches and update the instruction file
+          branches=("patch-2")  # List all your branches here
+          for branch in "${branches[@]}"; do
+            git checkout $branch
+            echo "$updated_content" > instruction.txt
+            git commit -am "Update instruction file from main branch"
+            git push origin $branch
+          done
+
+      - name: Switch back to main branch and push
+        run: |
+          git checkout main
+          git push origin main
+
