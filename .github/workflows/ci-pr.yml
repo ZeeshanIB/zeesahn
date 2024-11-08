@@ -5,7 +5,8 @@ on:
     types: [opened, edited, reopened]
     branches:
       - patch-1
-
+    paths-ignore:
+      - '.github/workflows/**'
 
 jobs:
   validate-pr-description:
@@ -24,21 +25,21 @@ jobs:
           PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
 
           # Define keywords (add keywords here as needed)
-          KEYWORDS=("DOP" "PROJ" "TASK")
+          KEYWORDS=("DOP-" "ZTNA-" "UZ-")
 
-          # Initialize a flag to check if any keyword is found
-          keyword_found=false
+          # Initialize a flag to check if any valid pattern is found
+          pattern_found=false
 
-          # Check if any keyword is present in the PR description, case-insensitively
+          # Check for each keyword followed by exactly four digits, case-sensitively
           for keyword in "${KEYWORDS[@]}"; do
-            if echo "$PR_DESCRIPTION" | grep -iq "$keyword"; then
-              keyword_found=true
+            if echo "$PR_DESCRIPTION" | grep -qE "${keyword}[0-9]{4}"; then
+              pattern_found=true
               break
             fi
           done
 
-          # Fail the job if none of the keywords are found
-          if [ "$keyword_found" = false ]; then
-            echo "PR description does not contain any of the required keywords (e.g., DOP, PROJ, TASK)."
+          # Fail the job if no valid pattern is found
+          if [ "$pattern_found" = false ]; then
+            echo "PR description does not contain any of the required patterns (e.g., DOP-1234, ZTNA-5678, UZ-9101)."
             exit 1
           fi
