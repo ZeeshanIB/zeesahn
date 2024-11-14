@@ -4,6 +4,7 @@ on:
     types: [opened, edited, reopened]
     branches:
       - patch-1
+      - develop
       - release-*
     paths-ignore:
       - '.github/workflows/**'
@@ -24,6 +25,10 @@ jobs:
           PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
           PR_TITLE=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
 
+          # Debugging: print out PR title and description
+          echo "PR Title: $PR_TITLE"
+          echo "PR Description: $PR_DESCRIPTION"
+
           # Define keywords (add keywords here as needed)
           KEYWORDS=("DOP-" "ZTNA-" "UZ-")
 
@@ -40,6 +45,9 @@ jobs:
 
           # Extract lines with 'Ticket number:' from the PR description
           TICKET_LINES=$(echo "$PR_DESCRIPTION" | grep -i "Ticket number:")
+
+          # Debugging: print out extracted ticket lines
+          echo "Ticket Lines from PR Description: $TICKET_LINES"
 
           # Loop through each matching line and check for the required patterns
           while IFS= read -r line; do
