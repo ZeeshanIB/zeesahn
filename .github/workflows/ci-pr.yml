@@ -1,16 +1,15 @@
 name: PR Description Validator
-
 on:
   pull_request:
     types: [opened, edited, reopened]
     branches:
-      - patch-1
+      - develop
+      - release-*
     paths-ignore:
       - '.github/workflows/**'
-
 jobs:
   validate-pr-description:
-    name: Validate PR Description
+    name: Validate PR Title and Description
     runs-on: ubuntu-latest
     steps:
       - name: Set up workspace
@@ -19,17 +18,29 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Validate PR Description
+      - name: Validate PR Title and Description
         run: |
-          # Fetch PR description using jq
+          # Fetch PR description and title using jq
           PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
+          PR_TITLE=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
+
           # Define keywords (add keywords here as needed)
           KEYWORDS=("DOP-" "ZTNA-" "UZ-")
+
           # Initialize a flag to check if any valid pattern is found
           pattern_found=false
-          # Extract lines with 'Ticket number:'
+
+          # Check the PR title for valid patterns
+          for keyword in "${KEYWORDS[@]}"; do
+            if echo "$PR_TITLE" | grep -qE "${keyword}[0-9]{4}"; then
+              pattern_found=true
+              break
+            fi
+          done
+
+          # Extract lines with 'Ticket number:' from the PR description
           TICKET_LINES=$(echo "$PR_DESCRIPTION" | grep -i "Ticket number:")
-          
+
           # Loop through each matching line and check for the required patterns
           while IFS= read -r line; do
             for keyword in "${KEYWORDS[@]}"; do
@@ -42,6 +53,6 @@ jobs:
 
           # Fail the job if no valid pattern is found
           if [ "$pattern_found" = false ]; then
-            echo "PR description must contain a line with 'Ticket number:' followed by one of the required patterns (e.g., Ticket number: DOP-1234, Ticket number: ZTNA-5678, Ticket number: UZ-9101)."
+            echo "PR must contain a valid 'Ticket number:' with one of the required patterns in either the title or description (e.g., Ticket number: DOP-1234, Ticket number: ZTNA-5678, Ticket number: UZ-9101)."
             exit 1
           fi
