@@ -23,23 +23,21 @@ jobs:
         run: |
           # Fetch PR description using jq
           PR_DESCRIPTION=$(jq -r ".pull_request.body" "$GITHUB_EVENT_PATH")
-
           # Define keywords (add keywords here as needed)
           KEYWORDS=("DOP-" "ZTNA-" "UZ-")
-
           # Initialize a flag to check if any valid pattern is found
           pattern_found=false
-
-          # Check for each keyword followed by exactly four digits, case-sensitively
-          for keyword in "${KEYWORDS[@]}"; do
-            if echo "$PR_DESCRIPTION" | grep -qE "${keyword}[0-9]{4}"; then
-              pattern_found=true
-              break
-            fi
+          # Filter lines with 'Ticket number:' and check each line for the required patterns
+          echo "$PR_DESCRIPTION" | grep -i "Ticket number:" | while read -r line; do
+            for keyword in "${KEYWORDS[@]}"; do
+              if echo "$line" | grep -qE "${keyword}[0-9]{4}"; then
+                pattern_found=true
+                break 2
+              fi
+            done
           done
-
           # Fail the job if no valid pattern is found
           if [ "$pattern_found" = false ]; then
-            echo "PR description does not contain any of the required patterns (e.g., DOP-1234, ZTNA-5678, UZ-9101)."
+            echo "PR description must contain a line with 'Ticket number:' followed by one of the required patterns (e.g., Ticket number: DOP-1234, Ticket number: ZTNA-5678, Ticket number: UZ-9101)."
             exit 1
           fi
