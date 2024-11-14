@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened, edited, reopened]
     branches:
-      - develop
+      - patch-1
       - release-*
     paths-ignore:
       - '.github/workflows/**'
