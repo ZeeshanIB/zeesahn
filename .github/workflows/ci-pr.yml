@@ -6,6 +6,8 @@ on:
       - patch-1
       - develop
       - release-*
+    paths-ignore:
+      - '.github/workflows/**'
 
 jobs:
   validate-pr-description:
