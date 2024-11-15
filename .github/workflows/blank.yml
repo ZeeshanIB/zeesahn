@@ -4,8 +4,7 @@ on:
     types: [opened, edited, reopened]
     branches:
       - patch-1
-      - develop
-      - release-*
+
     paths:
       - '.github/workflows/**'
 jobs:
