@@ -1,1 +1,16 @@
-
+name: PR Description Validator
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+    branches:
+      - develop
+      - release-*
+    paths:
+      - '.github/workflows/**'
+jobs:
+  validate-pr-description:
+    name: Validate PR Description
+    runs-on: ubuntu-latest
+    steps:
+      - name: No check required
+        run: echo "No check required for this PR"
