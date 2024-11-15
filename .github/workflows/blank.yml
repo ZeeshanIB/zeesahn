@@ -3,13 +3,14 @@ on:
   pull_request:
     types: [opened, edited, reopened]
     branches:
+      - patch-1
       - develop
       - release-*
     paths:
       - '.github/workflows/**'
 jobs:
   validate-pr-description:
-    name: Validate PR Description
+    name: Validate PR Title and Description
     runs-on: ubuntu-latest
     steps:
       - name: No check required
