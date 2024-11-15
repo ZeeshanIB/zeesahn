@@ -6,14 +6,26 @@ on:
       - patch-1
       - develop
       - release-*
+
 jobs:
   validate-pr-description:
     name: Validate PR Title and Description
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.changed_files != 0 && !contains(github.event.pull_request.changed_files, '.github/workflows/') }}
     steps:
       - name: Set up workspace
         uses: actions/checkout@v2
+
+      - name: Fetch Changed Files
+        id: files
+        run: |
+          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
+          echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
+
+      - name: Skip Validation if Only Workflows Changed
+        if: ${{ contains(env.CHANGED_FILES, '.github/workflows/') && env.CHANGED_FILES == '.github/workflows/' }}
+        run: |
+          echo "Only workflow files changed. Skipping validation."
+          exit 0
 
       - name: Install jq
         run: sudo apt-get install -y jq
