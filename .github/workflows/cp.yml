@@ -75,4 +75,4 @@ jobs:
           author: ${{ env.original_author_name }} <${{ env.original_author_email }}>
           assignees: ${{ env.pr_author }}
 env:
-  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
