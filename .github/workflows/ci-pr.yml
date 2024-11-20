@@ -1,4 +1,5 @@
-name: Validate PR Description
+name: PR Description Validator
+
 on:
   pull_request:
     types: [opened, edited, reopened]
@@ -11,23 +12,11 @@ on:
 
 jobs:
   validate-pr-description:
-    name: Validate PR Title and Description
+    name: Validate PR Description
     runs-on: ubuntu-latest
     steps:
       - name: Set up workspace
         uses: actions/checkout@v2
-
-      - name: Fetch Changed Files
-        id: files
-        run: |
-          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
-          echo "CHANGED_FILES=$CHANGED_FILES" >> $GITHUB_ENV
-
-      - name: Skip Validation if Only Workflows Changed
-        if: ${{ contains(env.CHANGED_FILES, '.github/workflows/') && env.CHANGED_FILES == '.github/workflows/' }}
-        run: |
-          echo "Only workflow files changed. Skipping validation."
-          exit 0
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -59,14 +48,22 @@ jobs:
 
           # If no valid pattern found in title, check the PR description
           if [ "$pattern_found" = false ] && [[ "$PR_DESCRIPTION" != "null" && -n "$PR_DESCRIPTION" ]]; then
-            # Check the entire PR description for valid ticket numbers
-            for keyword in "${KEYWORDS[@]}"; do
-              if echo "$PR_DESCRIPTION" | grep -qE "${keyword}[0-9]{4}"; then
-                pattern_found=true
-                echo "Valid ticket number found in PR description."
-                break
-              fi
-            done
+            # Extract lines with 'Ticket number:' from the PR description
+            TICKET_LINES=$(echo "$PR_DESCRIPTION" | grep -i "Ticket number:")
+
+            # Debugging: print out extracted ticket lines
+            echo "Ticket Lines from PR Description: $TICKET_LINES"
+
+            # Loop through each matching line and check for the required patterns
+            while IFS= read -r line; do
+              for keyword in "${KEYWORDS[@]}"; do
+                if echo "$line" | grep -qE "${keyword}[0-9]{4}"; then
+                  pattern_found=true
+                  echo "Valid ticket number found in PR description."
+                  break 2
+                fi
+              done
+            done <<< "$TICKET_LINES"
           fi
 
           # Fail the job if no valid pattern is found
