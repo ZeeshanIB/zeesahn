@@ -47,17 +47,12 @@ jobs:
           pr_number=${{ github.event.pull_request.number }}
           api_url="https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}"
           response=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" $api_url)
-          pr_description=$(echo $response | jq -r '.body')
+          pr_description=$(echo $response | jq -r '.body // "No description provided"')
           echo "original_pr_description=$pr_description" >> $GITHUB_ENV
+          echo "Extracted PR Description: $pr_description"
 
-      - name: Get Original PR Author
-        id: get_pr_author
-        run: |
-          pr_number=${{ github.event.pull_request.number }}
-          api_url="https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}"
-          response=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" $api_url)
-          pr_author=$(echo $response | jq -r '.user.login')
-          echo "pr_author=$pr_author" >> $GITHUB_ENV
+
+
 
       - name: Cherry-Pick into Develop Branch
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.10
