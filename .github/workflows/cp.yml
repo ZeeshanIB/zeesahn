@@ -1,0 +1,69 @@
+name: Cherry-Pick Workflow
+on:
+  pull_request:
+    branches:
+      - release-v24.2.0
+    types: ["closed"]
+jobs:
+  cherry_pick_job:
+    runs-on: ubuntu-22.04
+    name: Cherry Pick PR into Develop Branch
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'cherry-pick-develop') && github.event.pull_request.merged == true }}
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GCR_TOKEN_ZTNA }}
+
+      - name: Retrieve Original Commit Info
+        id: get_commit_info
+        run: |
+          original_commit=$(git log -1 --pretty=format:'%H')
+          if git log -1 --pretty=format:'%P' | grep -q ' '; then
+            # It's a merge commit
+            original_commit=$(git log -1 --pretty=format:'%P' | awk '{print $2}')
+            original_committer_name=$(git show -s --pretty=format:'%cn' $original_commit)
+            original_committer_email=$(git show -s --pretty=format:'%ce' $original_commit)
+            original_author_name=$(git show -s --pretty=format:'%an' $original_commit)
+            original_author_email=$(git show -s --pretty=format:'%ae')
+          else
+            # It's a regular commit
+            original_committer_name=$(git log -1 --pretty=format:'%cn')
+            original_committer_email=$(git log -1 --pretty=format:'%ce')
+            original_author_name=$(git log -1 --pretty=format:'%an')
+            original_author_email=$(git log -1 --pretty=format:'%ae')
+          fi
+          echo "original_commit=$original_commit" >> $GITHUB_ENV
+          echo "original_committer_name=$original_committer_name" >> $GITHUB_ENV
+          echo "original_committer_email=$original_committer_email" >> $GITHUB_ENV
+          echo "original_author_name=$original_author_name" >> $GITHUB_ENV
+          echo "original_author_email=$original_author_email" >> $GITHUB_ENV
+
+      - name: Get Original PR Author
+        id: get_pr_author
+        run: |
+          pr_number=${{ github.event.pull_request.number }}
+          api_url="https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}"
+          response=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" $api_url)
+          pr_author=$(echo $response | jq -r '.user.login')
+          echo "pr_author=$pr_author" >> $GITHUB_ENV
+
+      - name: Cherry-Pick into Develop Branch
+        uses: carloscastrojumo/github-cherry-pick-action@v1.0.10
+        with:
+          branch: develop
+          labels: |
+            cherry-pick
+          reviewers: |
+            sohaibomr
+            salmanmalik-emb
+            aroojfatima41
+            syed-farazahmed
+          title: '[cherry-pick] {old_title}'
+          body: 'Cherry picking #{old_pull_request_id} onto this branch. {old_description}'
+          committer: ${{ env.original_committer_name }} <${{ env.original_committer_email }}>
+          author: ${{ env.original_author_name }} <${{ env.original_author_email }}>
+          assignees: ${{ env.pr_author }}
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
