@@ -2,7 +2,7 @@ name: Cherry-Pick Workflow
 on:
   pull_request:
     branches:
-      - release-v24.2.0
+      - patch-1
     types: ["closed"]
 jobs:
   cherry_pick_job:
