@@ -58,10 +58,7 @@ jobs:
           labels: |
             cherry-pick
           reviewers: |
-            sohaibomr
-            salmanmalik-emb
-            aroojfatima41
-            syed-farazahmed
+            ZeeshanIB
           title: '[cherry-pick] {old_title}'
           body: 'Cherry picking #{old_pull_request_id} onto this branch. {old_description}'
           committer: ${{ env.original_committer_name }} <${{ env.original_committer_email }}>
