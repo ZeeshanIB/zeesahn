@@ -52,7 +52,7 @@ jobs:
       - name: Cherry-Pick into Develop Branch
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.10
         with:
-          branch: patch-1
+          branch: main
           labels: |
             cherry-pick
           reviewers: |
