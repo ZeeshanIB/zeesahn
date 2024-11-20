@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          token: ${{ secrets.GCR_TOKEN_ZTNA }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Retrieve Original Commit Info
         id: get_commit_info
